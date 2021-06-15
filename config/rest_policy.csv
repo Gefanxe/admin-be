@@ -3,4 +3,4 @@ p, *, /posts, (GET)|(POST)
 
 # admins can also delete and update posts
 p, admin, /post/*, (DELETE)|(UPDATE)
-p, andersen, /test/*, (GET)|(POST)
+p, andersen, /api/*, (GET)|(POST)

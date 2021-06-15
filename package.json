@@ -21,6 +21,7 @@
     "@prisma/client": "2.24.1",
     "axios": "0.21.1",
     "casbin": "5.7.2",
+    "casbin-basic-adapter2": "^0.1.1",
     "dotenv": "10.0.0",
     "dotenv-expand": "5.1.0",
     "fastify": "3.17.0",

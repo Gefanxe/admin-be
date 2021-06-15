@@ -26,3 +26,6 @@ npx prisma generate
 # prisma merge
 npx prisma-merge
 ```
+
+# TODO
+env環境準備(test,production)

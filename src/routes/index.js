@@ -15,7 +15,8 @@ const routes = [
     method: 'GET',
     url: '/test',
     handler: testController.getTests,
-    preValidation: _preValidation
+    preValidation: _preValidation,
+    casbin: { rest: true }
   },
   {
     method: 'GET',
