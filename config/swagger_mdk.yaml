@@ -1,0 +1,1474 @@
+swagger: "2.0"
+info:
+  description: "使用 Node.js, Fastify, Prisma... 製作"
+  version: "1.0.0"
+  title: "MDK動態牆 API"
+  termsOfService: ""
+  contact:
+    email: "andersenhuang@reas.com.tw"
+  license:
+    name: "Copyright 2021 © Reas inc"
+    url: "https://reas.com.tw/"
+host: "my.mdkforum.com"
+basePath: "/"
+tags:
+- name: "測試"
+  description: "測試用"
+- name: "用戶相關"
+  description: "存取用戶相關資料"
+- name: "動態相關"
+  description: "存取動態牆相關資料"
+schemes:
+- "https"
+paths:
+  /node/tests:
+    get:
+      tags:
+      - "測試"
+      summary: "開發人員用"
+      description: "無描述"
+      operationId: "test"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              result:
+                type: boolean
+                default: true
+                description: 執行結果
+              status:
+                type: number
+                default: 0
+                description: 'success code'
+              message:
+                type: string
+                default: ok
+                description: 錯誤訊息
+        "500":
+          description: Default Response
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+      security:
+      - Bearer: []
+  /node/social/userstatus:
+    get:
+      tags:
+      - "用戶相關"
+      summary: "..."
+      description: "取用戶目前的登入狀態用戶"
+      operationId: "userstatus"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              result:
+                type: boolean
+                description: 執行結果
+              avatar:
+                type: string
+                description: 用戶頭像(登入失敗回傳空值)
+              email:
+                type: string
+                description: 個人資料
+              profile:
+                type: object
+                properties:
+                  realName:
+                    type: string
+                    description: 用戶真實姓名(登入失敗回傳空值)
+              uId:
+                type: number
+                description: "用戶uid,-1:用戶名稱(或email)錯誤,-2:錯誤密碼,-3:安全提問錯誤,-4:以上錯誤累計超過論壇設定值"
+              userName:
+                type: string
+                description: 用戶名稱
+        "500":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              result:
+                type: boolean
+                default: false
+                description: 執行結果
+              status:
+                type: number
+                default: -1
+                description: 'status code: 500'
+              message:
+                type: string
+                default: error
+                description: 錯誤訊息
+      security:
+      - Bearer: []
+  /node/social/userlogin:
+    post:
+      tags:
+      - "用戶相關"
+      summary: "..."
+      description: "用戶登入"
+      operationId: "userlogin"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            required:
+              - g-recaptcha-response
+              - ip
+              - loginfield
+              - password
+              - username
+            properties:
+              loginfield:
+                type: string
+                default: username
+                description: 登入默認選項 username/email
+              username:
+                type: string
+                minLength: 3
+                description: 用戶帳號
+              password:
+                type: string
+                description: 用戶密碼
+              ip:
+                type: string
+                pattern: \d+\.\d+\.\d+\.\d+
+                default: 127.0.0.1
+                description: 用戶來源IP
+              g-recaptcha-response:
+                type: string
+                description: Google reCAPTCHA v2 Token
+              questionid:
+                type: number
+                description: 安全提問id
+              answer:
+                type: string
+                default: ''
+                description: 安全提問的答案
+      responses:
+        '200':
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: '錯誤代碼,0:正常,-1:google驗證錯誤,-2:登入失敗'
+              member:
+                type: object
+                properties:
+                  avatar:
+                    type: string
+                    description: 用戶頭像(登入失敗回傳空值)
+                  email:
+                    type: string
+                    description: 個人資料
+                  password:
+                    type: string
+                    description: 用戶密碼(登入密碼錯誤才會回傳)
+                  profile:
+                    type: object
+                    properties:
+                      realName:
+                        type: string
+                        description: 用戶真實姓名(登入失敗回傳空值)
+                  token:
+                    type: string
+                    description: 登入成功token(登入失敗回傳空值)
+                  uId:
+                    type: number
+                    description: '用戶uid,-1:用戶名稱(或email)錯誤,-2:錯誤密碼,-3:安全提問錯誤,-4:以上錯誤累計超過論壇設定值'
+                  userName:
+                    type: string
+                    description: 用戶名稱
+              message:
+                type: string
+                description: 說明訊息
+              result:
+                type: boolean
+                description: 執行結果
+  /node/social/userlogout:
+    get:
+      tags:
+      - "用戶相關"
+      summary: "..."
+      description: "用戶登出"
+      operationId: "userlogout"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: '錯誤代碼,0:正常,-1:失敗'
+              message:
+                type: string
+                description: 說明訊息
+              result:
+                type: boolean
+                description: 執行結果
+  /node/social/user/{uid}:
+    get:
+      tags:
+      - "用戶相關"
+      summary: "Find pet by ID"
+      description: "取動態牆用戶資料"
+      operationId: "getoneuserdata"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "uid"
+        in: "path"
+        description: "用戶uid"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              authorAvatar:
+                type: string
+                description: 用戶頭像
+              feeds:
+                type: number
+                description: 相關貼文總數
+              groupId:
+                type: number
+                description: 用戶組id
+              groupName:
+                type: string
+                description: 用戶組名稱
+              profile:
+                type: object
+                properties:
+                  info:
+                    type: string
+                    description: 個人資料
+                  realName:
+                    type: string
+                    description: 用戶名稱
+                  fb:
+                    type: string
+                    description: facebook連結
+                  ig:
+                    type: string
+                    description: Instagram連結
+              uId:
+                type: number
+                description: 用戶id
+              userName:
+                type: string
+                description: 用戶帳號
+              voteInfo:
+                type: object
+                properties:
+                  link:
+                    type: string
+                    description: 投票頁連結
+                  num:
+                    type: string
+                    description: 票數
+                  rank:
+                    type: string
+                    description: 投票排名
+      security:
+      - Bearer: []
+    post:
+      tags:
+      - 用戶相關
+      summary: ...
+      description: 動態牆用戶資料更新
+      operationId: "setoneuserdata"
+      parameters:
+        - name: "uid"
+          in: "path"
+          description: "用戶uid"
+          required: true
+          type: "integer"
+          format: "int64"
+        - name: body
+          in: body
+          schema:
+            type: object
+            required:
+            - uid
+            - realName
+            properties:
+              uid:
+                type: number
+                description: 用戶id
+              realName:
+                type: string
+                description: 用戶真實姓名
+              info:
+                type: string
+                description: 個人資料
+              fb:
+                type: string
+                description: facebook連結
+              ig:
+                type: string
+                description: Instagram連結
+      security:
+        - Bearer: []
+      responses:
+        '200':
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              result:
+                type: boolean
+                description: 執行結果
+              status:
+                type: number
+                description: 'status code: 500'
+              message:
+                type: string
+                description: 錯誤訊息
+              member:
+                type: object
+                properties:
+                  profile:
+                    type: object
+                    properties:
+                      info:
+                        type: string
+                        description: 個人資料
+                      realName:
+                        type: string
+                        description: 用戶名稱
+                      fb:
+                        type: string
+                        description: facebook連結
+                      ig:
+                        type: string
+                        description: Instagram連結
+                  uId:
+                    type: number
+                    description: 用戶id
+        '500':
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              result:
+                type: boolean
+                description: 執行結果
+              status:
+                type: number
+                description: 'status code: 500'
+              message:
+                type: string
+                description: 錯誤訊息
+  /node/social/userposts/{uid}:
+    get:
+      tags:
+      - "用戶相關"
+      summary: "..."
+      description: "取動態牆用戶相關貼文"
+      operationId: "getuserposts"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "lastpost"
+        in: "query"
+        description: "lastpost"
+        required: false
+        type: "integer"
+        format: "int64"
+      - name: "uid"
+        in: "path"
+        description: "用戶uid"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                attachment:
+                  type: object
+                  properties:
+                    fileType:
+                      type: number
+                      description: '附件類型, 0=無附件, 1=照片, 2=YT影片連結'
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          dateline:
+                            type: number
+                            description: 建立時間
+                          fileType:
+                            type: number
+                            description: '附件類型, 1=照片, 2=YT影片連結'
+                          id:
+                            type: number
+                            description: 照片id
+                          pid:
+                            type: number
+                            description: 貼文id
+                          resPath:
+                            type: string
+                            description: '附件內容, 照片路徑 or YT影片連結'
+                author:
+                  type: string
+                  description: 用戶名稱
+                authorAvatar:
+                  type: string
+                  description: 用戶頭像
+                authorid:
+                  type: number
+                  description: 用戶id
+                commentCount:
+                  type: number
+                  description: 留言總數
+                comments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      comment:
+                        type: string
+                        description: 用戶留言內容
+                      dateline:
+                        type: number
+                        description: 留言時間
+                      uid:
+                        type: number
+                        description: 留言用戶id
+                      username:
+                        type: string
+                        description: 留言用戶名稱
+                      avatar:
+                        type: string
+                        description: 留言用戶頭像
+                coverImg:
+                  type: string
+                  description: 貼文封面圖
+                fid:
+                  type: number
+                  description: 論壇版塊id
+                isLike:
+                  type: number
+                  description: '用戶是否有點讚(1:是/0:否)'
+                isShare:
+                  type: number
+                  description: '用戶是否有分享(1:是/0:否)'
+                lastpost:
+                  type: number
+                  description: 貼文最發表時間
+                likeCount:
+                  type: number
+                  description: 貼文點讚總數
+                message:
+                  type: string
+                  description: 貼文內容
+                postType:
+                  type: string
+                  description: 'PO文來源,t=論壇貼文, p=動態牆貼文'
+                shareCount:
+                  type: number
+                  description: 貼文分享讚總數
+                subject:
+                  type: string
+                  description: 貼文標題
+                tagList:
+                  type: array
+                  items:
+                    type: string
+                    description: 標籤名稱
+                tags:
+                  type: string
+                  description: 所有標籤字串
+                threadUrl:
+                  type: string
+                  description: 論壇貼文連結
+                tid:
+                  type: number
+                  description: 論壇貼文id
+      security:
+      - Bearer: []
+  /node/social/newposts:
+    get:
+      tags:
+      - "用戶相關"
+      summary: "..."
+      description: "取動態牆最新動態"
+      operationId: "newposts"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "lastpost"
+        in: "query"
+        description: "lastpost"
+        required: false
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                attachment:
+                  type: object
+                  properties:
+                    fileType:
+                      type: number
+                      description: '附件類型, 0=無附件, 1=照片, 2=YT影片連結'
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          dateline:
+                            type: number
+                            description: 建立時間
+                          fileType:
+                            type: number
+                            description: '附件類型, 1=照片, 2=YT影片連結'
+                          id:
+                            type: number
+                            description: 照片id
+                          pid:
+                            type: number
+                            description: 貼文id
+                          resPath:
+                            type: string
+                            description: '附件內容, 照片路徑 or YT影片連結'
+                author:
+                  type: string
+                  description: 用戶名稱
+                authorAvatar:
+                  type: string
+                  description: 用戶頭像
+                authorid:
+                  type: number
+                  description: 用戶id
+                commentCount:
+                  type: number
+                  description: 留言總數
+                comments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      comment:
+                        type: string
+                        description: 用戶留言內容
+                      dateline:
+                        type: number
+                        description: 留言時間
+                      uid:
+                        type: number
+                        description: 留言用戶id
+                      username:
+                        type: string
+                        description: 留言用戶名稱
+                      avatar:
+                        type: string
+                        description: 留言用戶頭像
+                coverImg:
+                  type: string
+                  description: 貼文封面圖
+                fid:
+                  type: number
+                  description: 論壇版塊id
+                isLike:
+                  type: number
+                  description: '用戶是否有點讚(1:是/0:否)'
+                isShare:
+                  type: number
+                  description: '用戶是否有分享(1:是/0:否)'
+                lastpost:
+                  type: number
+                  description: 貼文最發表時間
+                likeCount:
+                  type: number
+                  description: 貼文點讚總數
+                message:
+                  type: string
+                  description: 貼文內容
+                postType:
+                  type: string
+                  description: 'PO文來源,t=論壇貼文, p=動態牆貼文'
+                shareCount:
+                  type: number
+                  description: 貼文分享讚總數
+                subject:
+                  type: string
+                  description: 貼文標題
+                tagList:
+                  type: array
+                  items:
+                    type: string
+                    description: 標籤名稱
+                tags:
+                  type: string
+                  description: 所有標籤字串
+                threadUrl:
+                  type: string
+                  description: 論壇貼文連結
+                tid:
+                  type: number
+                  description: 論壇貼文id
+      security:
+      - Bearer: []
+  /node/social/like:
+    post:
+      tags:
+      - "動態相關"
+      summary: "..."
+      description: "按讚"
+      operationId: "like"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            required:
+              - linkId
+              - uid
+              - isLike
+              - postType
+            properties:
+              linkId:
+                type: number
+                description: PO文Id
+              uid:
+                type: number
+                description: 用戶Id
+              isLike:
+                type: number
+                description: '按讚/取消讚,1=讚,-1=倒讚'
+              postType:
+                type: string
+                description: 'PO文來源,t=論壇貼文, p=動態牆貼文'
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: '錯誤代碼,0:正常,-1:失敗'
+              message:
+                type: string
+                description: 說明訊息
+              result:
+                type: boolean
+                description: 執行結果
+      security:
+      - Bearer: []
+  /node/social/comment:
+    post:
+      tags:
+      - "動態相關"
+      summary: "..."
+      description: "留言"
+      operationId: "comment"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            required:
+              - linkId
+              - uid
+              - comment
+              - postType
+            properties:
+              linkId:
+                type: number
+                description: PO文Id
+              uid:
+                type: number
+                description: 用戶Id
+              comment:
+                type: string
+                description: 用戶Id
+              postType:
+                type: string
+                description: 'PO文來源,t=論壇貼文, p=動態牆貼文'
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: '錯誤代碼,0:正常,-1:失敗'
+              message:
+                type: string
+                description: 說明訊息
+              result:
+                type: boolean
+                description: 執行結果
+      security:
+      - Bearer: []
+  /node/social/post:
+    post:
+      tags:
+      - "動態相關"
+      summary: "..."
+      description: "貼文"
+      operationId: "post"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "fileType"
+          in: "formData"
+          description: "附件類型, 1=照片, 2=YT影片連結"
+          enum:
+          - 1
+          - 2
+          default: 1
+          required: true
+          type: "number"
+        - name: "photos"
+          in: "formData"
+          description: "照片圖檔"
+          required: false
+          type: "file"
+        - name: "message"
+          in: "formData"
+          description: "貼文訊息"
+          required: true
+          type: "string"
+        - name: "uid"
+          in: "formData"
+          description: "用戶Id"
+          required: true
+          type: "number"
+        - name: "ytlink"
+          in: "formData"
+          description: "YouTube連結"
+          required: false
+          type: "string"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: '錯誤代碼,0:正常,-1:失敗'
+              message:
+                type: string
+                description: 說明訊息
+              post:
+                type: object
+                properties:
+                  attachment:
+                    type: object
+                    properties:
+                      fileType:
+                        type: number
+                        description: '附件類型, 1=照片, 2=YT影片連結'
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            dateline:
+                              type: number
+                              description: 建立時間
+                            fileType:
+                              type: number
+                              description: '附件類型, 1=照片, 2=YT影片連結'
+                            id:
+                              type: number
+                              description: 照片id
+                            pid:
+                              type: number
+                              description: 貼文id
+                            resPath:
+                              type: string
+                              description: '附件內容, 照片路徑 or YT影片連結'
+                  author:
+                    type: string
+                    description: 用戶名稱
+                  authorAvatar:
+                    type: string
+                    description: 用戶頭像
+                  authorid:
+                    type: number
+                    description: 用戶id
+                  commentCount:
+                    type: number
+                    description: 留言總數
+                  comments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        comment:
+                          type: string
+                          description: 用戶留言內容
+                        dateline:
+                          type: number
+                          description: 留言時間
+                        uid:
+                          type: number
+                          description: 留言用戶id
+                        username:
+                          type: string
+                          description: 留言用戶名稱
+                        avatar:
+                          type: string
+                          description: 留言用戶頭像
+                  coverImg:
+                    type: string
+                    description: 貼文封面圖
+                  fid:
+                    type: number
+                    description: 論壇版塊id
+                  isLike:
+                    type: number
+                    description: '用戶是否有點讚(1:是/0:否)'
+                  isShare:
+                    type: number
+                    description: '用戶是否有分享(1:是/0:否)'
+                  lastpost:
+                    type: number
+                    description: 貼文最發表時間
+                  likeCount:
+                    type: number
+                    description: 貼文點讚總數
+                  message:
+                    type: string
+                    description: 貼文內容
+                  postType:
+                    type: string
+                    description: 'PO文來源,t=論壇貼文, p=動態牆貼文'
+                  shareCount:
+                    type: number
+                    description: 貼文分享讚總數
+                  subject:
+                    type: string
+                    description: 貼文標題
+                  tagList:
+                    type: array
+                    items:
+                      type: string
+                      description: 標籤名稱
+                  tags:
+                    type: string
+                    description: 所有標籤字串
+                  threadUrl:
+                    type: string
+                    description: 論壇貼文連結
+                  tid:
+                    type: number
+                    description: 論壇貼文id
+              result:
+                type: boolean
+                description: '執行結果,true=成功,false=失敗'
+      security:
+      - Bearer: []
+  /node/social/postupdate:
+    post:
+      tags:
+      - "動態相關"
+      summary: "..."
+      description: "更新貼文"
+      operationId: "postupdate"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "fileType"
+          in: "formData"
+          description: "附件類型, 1=照片, 2=YT影片連結"
+          required: true
+          type: "number"
+        - name: "photos"
+          in: "formData"
+          description: "照片圖檔"
+          required: false
+          type: "file"
+        - name: "message"
+          in: "formData"
+          description: "貼文訊息"
+          required: true
+          type: "string"
+        - name: "pid"
+          in: "formData"
+          description: "貼文id"
+          required: true
+          type: "number"
+        - name: "uid"
+          in: "formData"
+          description: "用戶Id"
+          required: true
+          type: "number"
+        - name: "ytlink"
+          in: "formData"
+          description: "YouTube連結"
+          required: false
+          type: "string"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: '錯誤代碼,0:正常,-1:失敗'
+              message:
+                type: string
+                description: 說明訊息
+              post:
+                type: object
+                properties:
+                  attachment:
+                    type: object
+                    properties:
+                      fileType:
+                        type: number
+                        description: '附件類型, 1=照片, 2=YT影片連結'
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            dateline:
+                              type: number
+                              description: 建立時間
+                            fileType:
+                              type: number
+                              description: '附件類型, 1=照片, 2=YT影片連結'
+                            id:
+                              type: number
+                              description: 照片id
+                            pid:
+                              type: number
+                              description: 貼文id
+                            resPath:
+                              type: string
+                              description: '附件內容, 照片路徑 or YT影片連結'
+                  author:
+                    type: string
+                    description: 用戶名稱
+                  authorAvatar:
+                    type: string
+                    description: 用戶頭像
+                  authorid:
+                    type: number
+                    description: 用戶id
+                  commentCount:
+                    type: number
+                    description: 留言總數
+                  comments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        comment:
+                          type: string
+                          description: 用戶留言內容
+                        dateline:
+                          type: number
+                          description: 留言時間
+                        uid:
+                          type: number
+                          description: 留言用戶id
+                        username:
+                          type: string
+                          description: 留言用戶名稱
+                        avatar:
+                          type: string
+                          description: 留言用戶頭像
+                  coverImg:
+                    type: string
+                    description: 貼文封面圖
+                  fid:
+                    type: number
+                    description: 論壇版塊id
+                  isLike:
+                    type: number
+                    description: '用戶是否有點讚(1:是/0:否)'
+                  isShare:
+                    type: number
+                    description: '用戶是否有分享(1:是/0:否)'
+                  lastpost:
+                    type: number
+                    description: 貼文最發表時間
+                  likeCount:
+                    type: number
+                    description: 貼文點讚總數
+                  message:
+                    type: string
+                    description: 貼文內容
+                  postType:
+                    type: string
+                    description: 'PO文來源,t=論壇貼文, p=動態牆貼文'
+                  shareCount:
+                    type: number
+                    description: 貼文分享讚總數
+                  subject:
+                    type: string
+                    description: 貼文標題
+                  tagList:
+                    type: array
+                    items:
+                      type: string
+                      description: 標籤名稱
+                  tags:
+                    type: string
+                    description: 所有標籤字串
+                  threadUrl:
+                    type: string
+                    description: 論壇貼文連結
+                  tid:
+                    type: number
+                    description: 論壇貼文id
+              result:
+                type: boolean
+                description: '執行結果,true=成功,false=失敗'
+      security:
+      - Bearer: []
+  /node/social/postdelete:
+    post:
+      tags:
+      - "動態相關"
+      summary: "..."
+      description: "刪除貼文"
+      operationId: "postdelete"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "body"
+          in: "body"
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: number
+                description: 貼文Id
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: '錯誤代碼,0:正常,-1:失敗'
+              message:
+                type: string
+                description: 說明訊息
+              result:
+                type: boolean
+                description: 執行結果
+      security:
+      - Bearer: []
+  /node/social/userList:
+    get:
+      tags:
+      - "用戶相關"
+      summary: "..."
+      description: "取網紅列表 標籤"
+      operationId: "userList"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                tagId:
+                  type: number
+                  description: 標籤ID
+                tagName:
+                  type: string
+                  description: 標籤名稱
+                member:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      uid:
+                        type: number
+                        description: 用戶ID
+                      realName:
+                        type: string
+                        description: 用戶名稱
+                      avatar:
+                        type: string
+                        description: 用戶頭貼
+      security:
+      - Bearer: []
+  /node/social/banner:
+    get:
+      tags:
+      - "動態相關"
+      summary: "..."
+      description: "取Banner"
+      operationId: "getbanner"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: '錯誤代碼,0:正常,-1:失敗'
+              message:
+                type: string
+                description: 說明訊息
+              banner:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    end_date:
+                      type: number
+                      description: 到期時間戳章
+                    link:
+                      type: string
+                      description: 點擊連結
+                    path:
+                      type: string
+                      description: 圖片路徑
+                    start_date:
+                      type: number
+                      description: 啟用時間戳章
+              result:
+                type: boolean
+                description: 執行結果
+    post:
+      tags:
+      - "動態相關"
+      summary: "..."
+      description: "新增Banner"
+      operationId: "addbanner"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "link"
+          in: "formData"
+          description: "點擊連結"
+          required: false
+          type: "string"
+        - name: "photos"
+          in: "formData"
+          description: "照片圖檔"
+          required: true
+          type: "file"
+        - name: "start_date"
+          in: "formData"
+          description: "開始時間timestamp"
+          required: true
+          type: "number"
+        - name: "end_date"
+          in: "formData"
+          description: "結束時間timestamp"
+          required: false
+          type: "number"
+        - name: "uid"
+          in: "formData"
+          description: "用戶id"
+          required: true
+          type: "number"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: '錯誤代碼,0:正常,-1:失敗'
+              message:
+                type: string
+                description: 說明訊息
+              result:
+                type: boolean
+                description: 執行結果
+      security:
+      - Bearer: []
+  /node/social/userPhotos/{uid}:
+    get:
+      tags:
+      - "動態相關"
+      summary: "..."
+      description: "取個人相片"
+      operationId: "getuserphotos"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "uid"
+          in: "path"
+          description: "用戶uid"
+          required: true
+          type: "number"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: '錯誤代碼,0:正常,-1:失敗'
+              message:
+                type: string
+                description: 說明訊息
+              photos:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    dateline:
+                      type: number
+                      description: 建立時間
+                    id:
+                      type: number
+                      description: 流水序號
+                    resPath:
+                      type: string
+                      description: 照片路徑
+              result:
+                type: boolean
+                description: 執行結果
+      security:
+      - Bearer: []
+  /node/social/post/{pid}:
+    get:
+      tags:
+      - "動態相關"
+      summary: "..."
+      description: "取單一貼文"
+      operationId: "getonepost"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "pid"
+          in: "path"
+          description: "PO文id"
+          required: true
+          type: "number"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: '錯誤代碼,0:正常,-1:失敗'
+              message:
+                type: string
+                description: 說明訊息
+              post:
+                type: object
+                properties:
+                  attachment:
+                    type: object
+                    properties:
+                      fileType:
+                        type: number
+                        description: '附件類型, 0=無附件, 1=照片, 2=YT影片連結'
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            dateline:
+                              type: number
+                              description: 建立時間
+                            fileType:
+                              type: number
+                              description: '附件類型, 1=照片, 2=YT影片連結'
+                            id:
+                              type: number
+                              description: 照片id
+                            pid:
+                              type: number
+                              description: 貼文id
+                            resPath:
+                              type: string
+                              description: '附件內容, 照片路徑 or YT影片連結'
+                  author:
+                    type: string
+                    description: 用戶名稱
+                  authorAvatar:
+                    type: string
+                    description: 用戶頭像
+                  authorid:
+                    type: number
+                    description: 用戶id
+                  commentCount:
+                    type: number
+                    description: 留言總數
+                  comments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        comment:
+                          type: string
+                          description: 用戶留言內容
+                        dateline:
+                          type: number
+                          description: 留言時間
+                        uid:
+                          type: number
+                          description: 留言用戶id
+                        username:
+                          type: string
+                          description: 留言用戶名稱
+                        avatar:
+                          type: string
+                          description: 留言用戶頭像
+                  coverImg:
+                    type: string
+                    description: 貼文封面圖
+                  fid:
+                    type: number
+                    description: 論壇版塊id
+                  isLike:
+                    type: number
+                    description: '用戶是否有點讚(1:是/0:否)'
+                  isShare:
+                    type: number
+                    description: '用戶是否有分享(1:是/0:否)'
+                  lastpost:
+                    type: number
+                    description: 貼文最發表時間
+                  likeCount:
+                    type: number
+                    description: 貼文點讚總數
+                  message:
+                    type: string
+                    description: 貼文內容
+                  postType:
+                    type: string
+                    description: 'PO文來源,t=論壇貼文, p=動態牆貼文'
+                  shareCount:
+                    type: number
+                    description: 貼文分享讚總數
+                  subject:
+                    type: string
+                    description: 貼文標題
+                  tagList:
+                    type: array
+                    items:
+                      type: string
+                      description: 標籤名稱
+                  tags:
+                    type: string
+                    description: 所有標籤字串
+                  threadUrl:
+                    type: string
+                    description: 論壇貼文連結
+                  tid:
+                    type: number
+                    description: 論壇貼文id
+              result:
+                type: boolean
+                description: '執行結果,true=成功,false=失敗'
+      security:
+      - Bearer: []
+
+securityDefinitions:
+  Bearer:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+definitions:
+  ApiErrorResponse:
+    type: object
+    properties:
+      result:
+        type: boolean
+        default: false
+        description: 執行結果
+      status:
+        type: number
+        default: -1
+        description: 'status code: 500'
+      message:
+        type: string
+        default: error
+        description: 錯誤訊息
+externalDocs:
+  description: "想看更多請找我"
+  url: "https://reas.com.tw/"

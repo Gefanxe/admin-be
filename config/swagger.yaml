@@ -1,0 +1,76 @@
+swagger: "2.0"
+info:
+  description: "使用 Node.js, Fastify, Prisma... 製作"
+  version: "1.0.0"
+  title: "Admin API"
+  termsOfService: ""
+  contact:
+    email: "actfire@gmail.com"
+  license:
+    name: "Copyright 2021"
+    url: "https://gefanxe.idv.tw/"
+host: "gefanxe.idv.tw"
+basePath: "/"
+tags:
+- name: "測試"
+  description: "測試用"
+# - name: "用戶相關"
+#   description: "存取用戶相關資料"
+# - name: "動態相關"
+#   description: "存取動態牆相關資料"
+schemes:
+- "http"
+- "https"
+paths:
+  /test:
+    get:
+      tags:
+      - "測試"
+      summary: "開發人員用"
+      description: "無描述"
+      operationId: "test"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: Default Response
+          schema:
+            type: object
+            properties:
+              result:
+                type: boolean
+                default: true
+                description: 執行結果
+              message:
+                type: string
+                default: ok
+                description: 錯誤訊息
+        "500":
+          description: Default Response
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+
+
+
+securityDefinitions:
+  Bearer:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+definitions:
+  ApiErrorResponse:
+    type: object
+    properties:
+      result:
+        type: boolean
+        default: false
+        description: 執行結果
+      message:
+        type: string
+        default: error
+        description: 錯誤訊息
+externalDocs:
+  description: "想看更多請找我"
+  url: "https://actfire.blogspot.com/"

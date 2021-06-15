@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model admin_permission {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique @db.VarChar(255)
+  comment   String?   @db.VarChar(255)
+  createdAt DateTime? @db.DateTime(0)
+  updatedAt DateTime? @db.DateTime(0)
+  deletedAt DateTime? @db.DateTime(0)
+}
+
+model admin_role {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique @db.VarChar(255)
+  comment   String?   @db.VarChar(255)
+  createdAt DateTime? @db.DateTime(0)
+  updatedAt DateTime? @db.DateTime(0)
+  deletedAt DateTime? @db.DateTime(0)
+}
+
+model admin_role_permission {
+  id        Int       @id @default(autoincrement())
+  rid       Int
+  pid       Int
+  createdAt DateTime? @db.DateTime(0)
+  updatedAt DateTime? @db.DateTime(0)
+  deletedAt DateTime? @db.DateTime(0)
+}
+
+model admin_user {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique @db.VarChar(255)
+  password  String?   @db.VarChar(255)
+  disabled  Boolean   @default(false)
+  createdAt DateTime? @db.DateTime(0)
+  updatedAt DateTime? @db.DateTime(0)
+  deletedAt DateTime? @db.DateTime(0)
+}
+
+model admin_user_role {
+  id        Int       @id @default(autoincrement())
+  uid       Int
+  rid       Int
+  createdAt DateTime? @db.DateTime(0)
+  updatedAt DateTime? @db.DateTime(0)
+  deletedAt DateTime? @db.DateTime(0)
+}
