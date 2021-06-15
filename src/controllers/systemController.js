@@ -13,30 +13,26 @@ exports.getCaptcha = async (req, reply) => {
 };
 
 exports.postLogin = async (req, reply) => {
-  try {
-    const resObj = {
-      result: false,
-      message: ''
-    };
+  const resObj = {
+    result: false,
+    message: ''
+  };
 
-    const _clientIp = req.body.ip;
-    const _username = req.body.username;
-    const _password = req.body.password;
+  const _clientIp = req.body.ip;
+  const _username = req.body.username;
+  const _password = req.body.password;
 
-    let tokenPayload = {
-      payload: {
-        username: _username,
-        clientip: _clientIp
-      }
-    };
+  let tokenPayload = {
+    payload: {
+      username: _username,
+      clientip: _clientIp
+    }
+  };
 
 
-    const jwtToken = req.fastify.jwt.sign(tokenPayload, {
-      expiresIn: process.env.JWT_EXPIRY
-    });
+  const jwtToken = req.fastify.jwt.sign(tokenPayload, {
+    expiresIn: process.env.JWT_EXPIRY
+  });
 
-    reply.send(jwtToken);
-  } catch (err) {
-    throw new Error(err);
-  }
+  reply.send(jwtToken);
 };

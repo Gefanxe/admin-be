@@ -7,9 +7,12 @@ module.exports = function (f) {
     let errMsg = error.message;
     let statusCode = 500;
 
+    let _ts = `(${Date.now().toString()})`;
+    request.log.error(_ts + error.stack);
+
     reply.type('application/json').status(statusCode).send({
       result: false,
-      message: errMsg
+      message: _ts + errMsg
     });
   })
 

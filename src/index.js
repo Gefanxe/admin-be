@@ -1,14 +1,23 @@
 require("dotenv-expand")(require("dotenv").config());
-
-const fastify = require("fastify")({
-  logger: true
-});
+const Fastify = require("fastify");
+// const fastify = require("fastify")({
+//   logger: {
+//     prettyPrint: {
+//       colorize: false,
+//       translateTime: 'SYS:STANDARD',
+//       ignore: 'pid,hostname,reqId,responseTime,req,res'
+//     },
+//     level: 'error',
+//     file: './logs/error.log'
+//   }
+// });
 
 // Run the server!
 // TODO: where to log error?
 const start = async () => {
 
-  // register
+  const fastify = require('./system/logger')(Fastify);
+  
   require('./system/staticFolder')(fastify);
   require('./system/cors')(fastify);
   require('./system/jwt')(fastify);
@@ -23,7 +32,6 @@ const start = async () => {
     await fastify.listen(process.env.SERVER_PORT);
     fastify.swagger();
     fastify.log.info(`server listening on ${fastify.server.address().port}`);
-    // console.log('fastify: ', fastify);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);

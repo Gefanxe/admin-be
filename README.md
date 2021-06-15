@@ -29,3 +29,4 @@ npx prisma-merge
 
 # TODO
 env環境準備(test,production)
+add casbin policy

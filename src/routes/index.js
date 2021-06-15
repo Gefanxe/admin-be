@@ -1,7 +1,7 @@
 const testController = require('../controllers/testController');
 const systemController = require('../controllers/systemController');
 
-async function _preValidation(request, reply, done) {
+async function _jwtValidate(request, reply, done) {
   try {
     await request.jwtVerify();
   } catch (err) {
@@ -15,7 +15,7 @@ const routes = [
     method: 'GET',
     url: '/test',
     handler: testController.getTests,
-    preValidation: _preValidation,
+    preValidation: _jwtValidate,
     casbin: { rest: true }
   },
   {
