@@ -123,3 +123,7 @@ src/prisma/client
 # test
 test.js
 .vscode/
+
+*.png
+
+*.jpg

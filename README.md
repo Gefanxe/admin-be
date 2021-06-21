@@ -30,3 +30,5 @@ npx prisma-merge
 # TODO
 env環境準備(test,production)
 add casbin policy
+errorList.js 持續補完
+vue.config.js 反向代理前後端（本機開發用）

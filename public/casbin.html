@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="loginForm">
+    <form name="loginForm">
+      <fieldset>
+        <legend>註冊表單</legend>
+        <p>
+          <label for="username">帳號:</label>
+          <input type="text" name="username" id="username" value="andersen" required>
+        </p>
+        <p>
+          <label for="password">密碼:</label>
+          <input type="password" name="password" id="password" value="oiceuthn" required>
+        </p>
+        <p>
+          <label for="captcha">group:</label>
+          <input type="text" id="group" name="group">
+        </p>
+        <p>
+          <input type="submit" value="送出">
+        </p>
+      </fieldset>
+    </form>
+  </div>
+
+  <script>
+    (async function () {
+      let serverHost = 'http://localhost:3000';
+      let token = document.getElementById('token');
+      let apiUrl = document.getElementById('apiUrl');
+      let result = document.getElementById('result');
+      let _ip = await getIpFromCF();
+
+      document.loginForm.onsubmit = function (evt) {
+        let form = evt.target;
+        evt.preventDefault();
+        console.log('form submit!');
+
+        let payload = Object.fromEntries(new FormData(form));        
+
+        let nodeApiUrl = serverHost + '/api/login';
+        payload.ip = _ip;
+
+        // console.log('form data: ', payload);
+
+        fetch(nodeApiUrl, {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        }).then(response => response.json()).then(res => {
+          console.log('result: ', res.message);
+          if (res.result) {
+            token.value = res.data.token;
+          }
+
+
+        }).catch(err => {
+          window.alert(err);
+        });
+
+        
+      };
+
+
+      // 從Cloudflare取 ip
+      async function getIpFromCF() {
+        let uriIP = 'https://www.cloudflare.com/cdn-cgi/trace';
+        let response = await fetch(uriIP);
+        let result = await response.text();
+        let returnResult = '';
+        result.split(/\r|\n/).some(function (item, idx, arr) {
+          let kv = item.split('=');
+          if (kv[0] == 'ip') {
+            returnResult = kv[1];
+            return true;
+          }
+        });
+        return returnResult;
+      }
+    })();
+  </script>
+</body>
+
+</html>

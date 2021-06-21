@@ -13,6 +13,7 @@ const start = async () => {
   require('./system/session')(fastify);
   require('./system/swagger')(fastify);
   require('./system/route')(fastify);
+  require('./system/hook')(fastify);
   require('./system/errorHandle')(fastify);
 
   try {

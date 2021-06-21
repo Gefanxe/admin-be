@@ -1,6 +1,3 @@
-# any user can get or create posts
 p, *, /posts, (GET)|(POST)
-
-# admins can also delete and update posts
 p, admin, /post/*, (DELETE)|(UPDATE)
-p, andersen, /api/*, (GET)|(POST)
+p, test, /api/*, (GET)|(POST)

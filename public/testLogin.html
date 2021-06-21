@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="loginForm">
+    <form name="loginForm">
+      <fieldset>
+        <legend>登入表單</legend>
+        <p>
+          <label for="username">帳號:</label>
+          <input type="text" name="username" id="username" value="andersen" required>
+        </p>
+        <p>
+          <label for="password">密碼:</label>
+          <input type="password" name="password" id="password" value="oiceuthn" required>
+        </p>
+        <p>
+          <label for="captcha">驗證碼:</label>
+          <input type="text" id="captcha" name="captcha">
+          <img id="captchaImg" src="/api/captcha" alt="" onclick="this.src='/api/captcha?t='+Date.now()">
+        </p>
+        <p>
+          <input type="submit" value="送出">
+        </p>
+      </fieldset>
+    </form>
+  </div>
+  <div>
+    Token:
+    <input type="text" id="token" style="width: 100%;">
+  </div>
+  <div>
+    call api url:
+    <input type="text" id="apiUrl" value="/api/user/info" style="width: 100%;"> <br>
+    <button id="btn">call api</button>
+  </div>
+  <pre id="result"></pre>
+  <script>
+    (async function () {
+      let serverHost = 'http://localhost:3000';
+      let token = document.getElementById('token');
+      let apiUrl = document.getElementById('apiUrl');
+      let btn = document.getElementById('btn');
+      let result = document.getElementById('result');
+      let _ip = await getIpFromCF();
+
+      document.loginForm.onsubmit = function (evt) {
+        let form = evt.target;
+        evt.preventDefault();
+
+        let payload = Object.fromEntries(new FormData(form));        
+
+        let nodeApiUrl = serverHost + '/api/login';
+        payload.ip = _ip;
+
+        // console.log('form data: ', payload);
+        let captchaImg = document.getElementById('captchaImg');
+        fetch(nodeApiUrl, {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        }).then(response => response.json()).then(res => {
+          console.log('result: ', res);
+          if (res.code === 20000) {
+            token.value = res.data.token;
+          } else {
+            captchaImg.src = '/api/captcha?t=' + Date.now();
+          }
+        }).catch(err => {
+          window.alert(err);
+        });
+
+        
+      };
+
+      btn.onclick = async function(evt) {
+        let _apiUrl = apiUrl.value;
+        if (_apiUrl !== '') {
+          let _accessToken = token.value;
+          let response = await fetch(_apiUrl, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + _accessToken
+            }
+          });
+          let res = await response.json();
+          result.innerHTML = JSON.stringify(res, null, 4);
+        }
+      };
+
+
+      // 從Cloudflare取 ip
+      async function getIpFromCF() {
+        let uriIP = 'https://www.cloudflare.com/cdn-cgi/trace';
+        let response = await fetch(uriIP);
+        let result = await response.text();
+        let returnResult = '';
+        result.split(/\r|\n/).some(function (item, idx, arr) {
+          let kv = item.split('=');
+          if (kv[0] == 'ip') {
+            returnResult = kv[1];
+            return true;
+          }
+        });
+        return returnResult;
+      }
+    })();
+  </script>
+</body>
+
+</html>

@@ -1,3 +1,4 @@
+require("dotenv-expand")(require("dotenv").config());
 const path = require('path');
 const mysql = require("mysql2");
 const { BasicAdapter } = require("casbin-basic-adapter2");
@@ -19,21 +20,20 @@ module.exports = async function (f) {
     e = some(where (p.eft == allow))
     
     [matchers]
-    m = (keyMatch(r.sub, p.sub) || g(r.sub, p.sub)) && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)
+    m = (keyMatch(r.sub, p.sub) || g(r.sub, p.sub)) && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act) || r.sub == "root"
   `;
-  
+
   let _model = new Model();
   _model.loadModelFromText(_conf);
 
   const _conn = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "0000",
-    database: "test"
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE
   });
-  
-  const _adapter = await BasicAdapter.newAdapter("mysql", _conn);
 
+  const _adapter = await BasicAdapter.newAdapter("mysql", _conn);
   f.register(require("fastify-casbin"), {
     model: _model,
     adapter: _adapter
