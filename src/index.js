@@ -3,7 +3,7 @@ const Fastify = require("fastify");
 
 const start = async () => {
 
-  const fastify = require('./system/logger')(Fastify);
+  const fastify = require('./system/init')(Fastify);
 
   require('./system/staticFolder')(fastify);
   require('./system/cors')(fastify);
@@ -13,12 +13,13 @@ const start = async () => {
   require('./system/session')(fastify);
   require('./system/swagger')(fastify);
   require('./system/route')(fastify);
+  require('./system/validatorCompiler')(fastify);
   require('./system/hook')(fastify);
   require('./system/errorHandle')(fastify);
 
   try {
     await fastify.listen(process.env.SERVER_PORT);
-    fastify.swagger();
+    fastify.swagger({ yaml: true });
     fastify.log.info(`server listening on ${fastify.server.address().port}`);
   } catch (err) {
     fastify.log.error(err);

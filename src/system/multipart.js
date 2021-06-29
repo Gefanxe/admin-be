@@ -6,6 +6,6 @@ module.exports = function (f) {
       fileSize: 52428800, // 52428800
       files: 10,
     },
-    attachFieldsToBody: true,
+    attachFieldsToBody: true
   });
 };

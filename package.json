@@ -19,6 +19,8 @@
   },
   "dependencies": {
     "@prisma/client": "2.24.1",
+    "ajv": "8.6.0",
+    "ajv-errors": "3.0.0",
     "axios": "0.21.1",
     "casbin": "5.7.2",
     "casbin-basic-adapter2": "0.1.1",
@@ -33,7 +35,7 @@
     "fastify-multipart": "4.0.6",
     "fastify-secure-session": "2.3.1",
     "fastify-static": "4.2.2",
-    "fastify-swagger": "4.7.0",
+    "fastify-swagger": "4.8.0",
     "json-keys-sort": "2.0.0",
     "mysql2": "2.2.5",
     "nanoid": "3.1.23",

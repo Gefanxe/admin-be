@@ -1,6 +1,30 @@
+// controller
 const testController = require('../controllers/testController');
 const systemController = require('../controllers/systemController');
 const userController = require('../controllers/user/userController');
+
+// schema
+const { systemLogin } = require('./schema/system');
+const { 
+  userInfo,
+  userCreate
+} = require('./schema/user');
+
+// const Ajv = require('ajv');
+// const ajv = new Ajv({
+//   useDefaults: true,
+//   coerceTypes: true,
+//   $data: true,
+//   extendRefs: true
+// });
+
+// ajv.addKeyword('isFileType', {
+//   compile: (schema, parent, it) => {
+//     parent.type = 'file'
+//     delete parent.isFileType
+//     return () => true
+//   }
+// });
 
 const routes = [
   {
@@ -24,7 +48,8 @@ const routes = [
   {
     method: 'POST',
     url: '/login',
-    handler: systemController.postLogin
+    handler: systemController.postLogin,
+    schema: systemLogin.schema
   },
   {
     method: 'POST',
@@ -36,15 +61,31 @@ const routes = [
     method: 'POST',
     url: '/user',
     handler: userController.postCreateUser,
-    preValidation: _jwtValidate,  // JsonWebToken驗證
-    casbin: { rest: true }        // 權限驗證
+    schema: userCreate.schema,
+    preValidation: _jwtValidate,
+    casbin: { rest: true },
+    // validatorCompiler: ({ schema, method, url, httpPart }) => {
+    //   return ajv.compile(schema);
+    // }
+  },
+  {
+    method: 'PUT',
+    url: '/user',
+    handler: userController.putUpdateUser,
+    // schema: ,
+    preValidation: _jwtValidate,
+    casbin: { rest: true },
+    // validatorCompiler: ({ schema, method, url, httpPart }) => {
+    //   return ajv.compile(schema);
+    // }
   },
   {
     method: 'GET',
     url: '/user/info',
     handler: userController.getUserInfo,
+    schema: userInfo.schema,
     preValidation: _jwtValidate
-  },
+  }
 ];
 
 async function _jwtValidate(request, reply, done) {

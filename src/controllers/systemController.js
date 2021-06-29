@@ -32,7 +32,7 @@ exports.postLogin = async (req, reply) => {
 
   // check captcha
   if (req.session.get('captcha') !== _captcha) {
-    return reply.send(err[50001]);
+    return reply.send(err[40001]);
   }
   
   // check user exist
@@ -43,7 +43,7 @@ exports.postLogin = async (req, reply) => {
   });
 
   if (!user) {
-    return reply.send(err[50002]);
+    return reply.send(err[40002]);
   }
 
   // validate password hash with salt
@@ -51,7 +51,7 @@ exports.postLogin = async (req, reply) => {
 
   if (user.password !== hashInputPwd) {
     // TODO: limit password error login for a while
-    return reply.send(err[50003]);
+    return reply.send(err[40003]);
   }
 
   // update login ip
@@ -65,7 +65,7 @@ exports.postLogin = async (req, reply) => {
   });
 
   // 成功
-  if (!ipUpdate) return reply.send(err[50004]);
+  if (!ipUpdate) return reply.send(err[40004]);
 
   let tokenPayload = {
     payload: {

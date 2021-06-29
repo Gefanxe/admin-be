@@ -1,18 +1,14 @@
 require("dotenv-expand")(require("dotenv").config());
 const prisma = require("../../instances/prisma");
 const toolFunc = require('../../libs/ToolFunc');
+const err = require('../../system/errorList');
 
 // const axios = require("axios");
 // axios.defaults.headers.common["Content-Type"] = "application/json";
 
 exports.postCreateUser = async (req, reply) => {
-  const resObj = {
-    result: false,
-    message: '',
-    data: {}
-  };
 
-  // 所有圖檔
+  // 圖檔
   const _avatar = await req.body.avatar;
 
   // 所有表單欄位
@@ -26,7 +22,8 @@ exports.postCreateUser = async (req, reply) => {
     salt: hashPwd.salt,
     name: input.name,
     email: input.email,
-    avatar: ''
+    avatar: '',
+    introduction: input.introduction
   };
 
   const existUser = await prisma.admin_user.count({
@@ -35,10 +32,7 @@ exports.postCreateUser = async (req, reply) => {
     }
   });
 
-  if (existUser > 0) {
-    resObj.message = '帳號已存在';
-    return resObj;
-  }
+  if (existUser > 0) return reply.send(err[40005]);
   
   // 處理大頭圖檔
   let savedFilePathAndName = '';
@@ -49,20 +43,54 @@ exports.postCreateUser = async (req, reply) => {
   }
 
   // save new user
+  let createUser;
   try {
-    const createUser = await prisma.admin_user.create({
+    createUser = await prisma.admin_user.create({
       data: _newUser
     });
-
-    resObj.result = true;
-    resObj.data = createUser;
   } catch (err) {
     // delete avatar
     if (savedFilePathAndName !== '') toolFunc.deleteFile(savedFilePathAndName);
     throw new Error(err);
   }
 
-  reply.send(resObj);
+  reply.send([20000, '', createUser]);
+};
+
+exports.putUpdateUser = async (req, reply) => {
+  // 圖檔
+  const _avatar = await req.body.avatar;
+
+  // 所有表單欄位
+  const input = Object.fromEntries(Object.keys(req.body).map((key) => [key, req.body[key].value]));
+
+  const _data = {
+    name: input.name,
+    email: input.email,
+    introduction: input.introduction
+  };
+
+  // 處理大頭圖檔
+  let savedFilePathAndName = '';
+  if (_avatar.filename !== '') {
+    let res = await toolFunc.avatarUpload(_avatar);
+    _data.avatar = res.displayPathAndName;
+    savedFilePathAndName = res.savePathAndName;
+  }
+
+  const updateUser = await prisma.admin_user.update({
+    where: {
+      username: input.username
+    },
+    data: _data
+  });
+
+  if (!updateUser) {
+    if (savedFilePathAndName !== '') toolFunc.deleteFile(savedFilePathAndName);
+    return reply.send(err[40004]);
+  }
+
+  reply.send([20000, '', updateUser]);
 };
 
 exports.getUserInfo = async (req, reply) => {
@@ -83,6 +111,8 @@ exports.getUserInfo = async (req, reply) => {
       last_login_ip: true,
     }
   });
+
+  if (!user) return reply.send(err[40002]);
 
   const roles = await req.fastify.casbin.getRolesForUser(user.username);
   user.roles = roles;

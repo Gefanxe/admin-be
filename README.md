@@ -1,3 +1,8 @@
+# 專案說明
+Node.js + Fastify + .........
+MySQL
+
+
 devDependencies
 npm i -D nodemon prisma prisma-merge
 

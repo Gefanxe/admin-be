@@ -27,11 +27,14 @@ module.exports = async function (f) {
       const newPayload = {
         code: payload[0],
         message: payload[1],
-        data: payload[2] ?? null
+        data: payload[2] ?? {}
       };
+      // 非 200
+      if (newPayload.code.toString().substr(0, 1) === '4') reply.code(400);
       done(null, newPayload);
     } else {
       done(null, payload);
     }
   });
+
 };

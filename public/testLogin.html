@@ -15,11 +15,11 @@
         <legend>登入表單</legend>
         <p>
           <label for="username">帳號:</label>
-          <input type="text" name="username" id="username" value="andersen" required>
+          <input type="text" name="username" id="username" value="andersen">
         </p>
         <p>
           <label for="password">密碼:</label>
-          <input type="password" name="password" id="password" value="oiceuthn" required>
+          <input type="password" name="password" id="password" value="oiceuthn">
         </p>
         <p>
           <label for="captcha">驗證碼:</label>
@@ -59,6 +59,7 @@
 
         let nodeApiUrl = serverHost + '/api/login';
         payload.ip = _ip;
+        // payload.ip = '127.0.0';
 
         // console.log('form data: ', payload);
         let captchaImg = document.getElementById('captchaImg');

@@ -61,9 +61,9 @@
 
         let payload = new FormData(form);
         payload.append('ip', _ip);
+        console.dir(form.avatar);
 
         let nodeApiUrl = serverHost + '/api/user';
-
         fetch(nodeApiUrl, {
           method: 'POST',
           headers: {
@@ -72,13 +72,9 @@
           body: payload
         }).then(response => response.json()).then(res => {
           console.log('result: ', res.message);
-
-
         }).catch(err => {
           window.alert(err);
-        });
-
-        
+        });        
       };
 
 
